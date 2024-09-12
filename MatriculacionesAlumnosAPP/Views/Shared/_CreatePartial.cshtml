@@ -1,0 +1,72 @@
+﻿@using MatriculacionesAlumnosAPP.ViewModels
+@model MatriculasAlumnosViewModel
+
+@{
+    ViewBag.Title = "CrearMatricula";
+}
+
+@using (Html.BeginForm("CrearMatricula", "Matricula", FormMethod.Post, new { @class = "row g-3 needs-validation", @novalidate = "true" }))
+{
+    <div class="row">
+        <div class="col-md-7 offset-2">
+            <div class="form-group">
+                <label for="ddlAlumno">Alumno</label>
+                <div class="input-group has-validation">
+                    @Html.DropDownListFor(m => m.AlumnoSeleccionado,
+                        new SelectList(Model.Alumnos, "AlumnoID", "nombreAlumno"), "- Selecciona -",
+                        new { @id = "ddlAlumno", @class = "form-control", required = "required" })
+                    <div class="invalid-feedback">
+                        Por favor, elija un alumno para matricular.
+                    </div>
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label for="ddlAsignatura">Asignatura</label>
+                <div class="input-group has-validation">
+                    @Html.DropDownListFor(m => m.AsignaturaSeleccionada,
+                        new SelectList(Model.Asignaturas, "AsignaturaID", "nombreAsignatura"), "- Selecciona -",
+                        new { @id = "ddlAsignatura", @class = "form-control", required = "required" })
+                    <div class="invalid-feedback">
+                        Por favor, elija una asignatura para matricular.
+                    </div>
+                </div>
+            </div>
+            <div class="form-group pb-3">
+                <label for="txtFecha">Fecha Matricula</label>
+                <div class="input-group has-validation">
+                    <input type="date" id="txtFecha" value="@Model.FechaMatricula" class="form-control" required />
+                    <div class="invalid-feedback">
+                        Por favor, elija fecha de matrícula.
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="form-group">
+                    <button type="submit" class="btn btn-outline-success">Crear</button>
+                    @Html.ActionLink("Cancelar", "VerMatriculas", "Matricula", new { id = false, sortOrder = "", currentFilter = "", searchString = "" }, new { @class = "btn btn-outline-warning" })
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script>
+    (() => {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+</script>

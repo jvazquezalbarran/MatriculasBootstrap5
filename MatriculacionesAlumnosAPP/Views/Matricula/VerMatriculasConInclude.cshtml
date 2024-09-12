@@ -1,0 +1,199 @@
+﻿@*@using MatriculacionesAlumnosAPP.Models
+    @model List<Matricula>*@
+
+
+@model PagedList.IPagedList<MatriculacionesAlumnosAPP.Models.Matricula>
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "VerMatriculasConInclude";
+}
+<link href="~/Content/css/main.css" rel="stylesheet" />
+@{
+    var pagedListOptions = new PagedListRenderOptions
+    {
+        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+        DisplayLinkToIndividualPages = true,
+        DisplayPageCountAndCurrentLocation = false,
+        MaximumPageNumbersToDisplay = 10,
+        DisplayEllipsesWhenNotShowingAllPageNumbers = true,
+        EllipsesFormat = "&#8230;",
+        LinkToFirstPageFormat = "First",
+        LinkToPreviousPageFormat = "Previous",
+        LinkToNextPageFormat = "Next",
+        LinkToLastPageFormat = "Last",
+       
+        UlElementClasses = new List<string> { "pagination"},
+        LiElementClasses = new List<string> { "page-item", "page-link" }
+
+
+    };
+}
+@*<style>
+        .ul.pagination {
+            display: inline-block;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul.pagination li {
+            display: inline;
+            background-color: lightblue;
+            box-shadow: initial;
+            color: white;
+        }
+
+            ul.pagination li a {
+                color: black;
+                float: left;
+                padding: 8px 16px;
+                text-decoration: none;
+                transition: background-color .3s;
+            }
+
+                ul.pagination li a.active {
+                    background-color: #4CAF50;
+                    color: white;
+                }
+
+                ul.pagination li a:hover:not(.active) {
+                    background-color: #ddd;
+                }
+    </style>*@
+
+<div class="container">
+    <div class="row">
+        <div class="col align-self-center offset-4">
+            <h4 class="py-3">MATRICULAS (BOOTSTRAP 5)</h4>
+        </div>
+    </div>
+    <div class="row pb-3">
+        <button type="button" class="btn btn-outline-success" data-bs-target="#myModal"
+                id="modalButton" data-bs-toggle="modal">
+            Nueva Matricula
+        </button>
+    </div>
+</div>
+
+@if (ViewBag.Buscador)
+{
+    <div class="container">
+        <div class="row">
+            <div class="col align-self-start col-md-5">
+                <form class="d-flex mb-2" role="search" method="get">
+                    @Html.TextBox("SearchString", ViewBag.CurrentFilter as string, new { @class = "form-control", @placeholder = "Buscar", @type = "search" })
+                    @*@Html.TextBox("SearchString", null, new { @class = "form-control", @placeholder = "Buscar", @type = "search" })*@
+                    @*<input class="form-control" type="search" placeholder="Buscar" aria-label="Buscar">*@
+                    <button class="btn btn-outline-success" type="submit">Buscar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+<table class="table table-hover table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            @*<th scope="col">Alumno</th>*@
+            <th scope="col">@Html.ActionLink("Alumno", "VerMatriculas", new { id = ViewBag.buscador, sortOrder = ViewBag.NameSortParam })</th>
+            <th scope="col" class="text-center">Edad</th>
+            <th scope="col">Asignatura</th>
+            <th scope="col" class="text-center">Creditos</th>
+            <th scope="col" class="text-center">@Html.ActionLink("Fecha Matricula", "VerMatriculas", new { id = ViewBag.buscador, sortOrder = ViewBag.DateSortParam })</th>
+            @*<th scope="col" class="text-center">Fecha Matricula</th>*@
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Alumno.nombreAlumno</td>
+                <td class="text-center">@item.Alumno.Edad</td>
+                <td>@item.Asignatura.nombreAsignatura</td>
+                <td class="text-center">@item.Asignatura.Creditos</td>
+                <td class="text-center">@item.Fecha_Matricula.ToShortDateString()</td>
+                <td class="text-center">
+                    <a class="btn btn-outline-danger" href="#" id="btnEliminar"
+                       onclick="eliminar(@item.MatriculaID)">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="container">
+    <div class="row">
+        <div class="col col-1">
+            Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+        </div>
+        <div class="col">
+            <nav class="pagination" aria-label="Page navigation">
+                @Html.PagedListPager(Model, page => Url.Action("VerMatriculas",
+                    new { id = ViewBag.buscador, page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }), pagedListOptions)
+            </nav>
+        </div>
+    </div>
+
+
+</div>
+
+<!-- Modal para crear nueva matricula -->
+
+<div class="modal fade" id="myModal" data-backdrop="static" data-bs-keyboard="false"
+     tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title fs-5" id="myModalLabel">Crear Matricula</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    @*<span aria-hidden="true">&times;</span>*@
+                </button>
+            </div>
+            <div class="modal-body" id="modalContent">
+                <!-- Aquí se cargará la vista parcial -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/sweetalert2")
+
+<script>
+    function eliminar(valor) {
+        Swal.fire({
+            title: "Eliminar esta matrícula?",
+            showDenyButton: true,
+            confirmButtonText: `Si,eliminar!!!`,
+            denyButtonText: `No, salir!`
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var url = '@Url.Action("EliminarMatricula", "Matricula",
+                        new { id = "__matriculaId__" })'
+                            .replace('__matriculaId__', valor);
+                window.location.href = url;
+            }
+        });
+    }
+    $(document).ready(function () {
+        $('#modalButton').click(function () {
+            $.ajax({
+                url: '@Url.Action("_CreatePartial", "Matricula")',
+                type: 'GET',
+                success: function (data) {
+                    $('#modalContent').html(data);
+                }
+            });
+            $('#myModal').modal('show');
+        });
+        $('#myModal').on('hidden.bs.modal', function () {
+            $('#modalContent').html(''); // Limpia el contenido del modal cuando se cierra
+        });
+    });
+
+</script>
+
+
+
